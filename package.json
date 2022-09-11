@@ -1,0 +1,20 @@
+{
+  "name": "creating-my-first-server",
+  "version": "1.0.0",
+  "description": "My first node.js server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "runThis": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shuja-jilani/Creating-my-first-server.git"
+  },
+  "author": "Shuja Husain Jilani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shuja-jilani/Creating-my-first-server/issues"
+  },
+  "homepage": "https://github.com/shuja-jilani/Creating-my-first-server#readme"
+}
