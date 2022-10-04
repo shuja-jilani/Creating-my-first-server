@@ -1,58 +1,59 @@
-const http = require('http'); //importing http package to use it in future like http.createserver
+const express = require('express');
+//initialisation
+const app = express();
+
+//application willl now use json format for data 
+app.use(express.json()); //use , for using express , express function app me dal dia h 
+
 
 const port = 8081; //4 digit no , local port no(only availabe on your laptop) , used for displaying our server on the browser, we can use any 4 digit no provided it is available 
 
 const toDoList = ["Complete Node Byte", "Play Cricket"];
 
+//http://localhost:8081/todos
+app.get("/todos", (req, res) => { //jab bhi todos me koi get request bheje to ye hoga 
+    //callback
+    res.status(200).send(toDoList); //humne todolist bhejdi h 200 ke status se that is OK , aur todolist pehle hi json format me h humara array h wo, wese hi dikhega 
 
-//to create the server
-//request se pta chlega user ne kya kya mnga h server se
-// http.createServer((request, response) => { //a callback function to handle requests and respond , these arguments, inhe bdl bhi skte h like req and res 
-//     response.writeHead(200, { 'Content-Type': 'text/html' }); //200 code means ok h text bhejo
-//     response.write("<h1>Hello, this is from  server</h1>"); //ye text
-//     response.end();
-//     //listen is used for users to access the server, log use kis port pr acces krenge etc, listening for requests ,
-// }).listen(port, () => { //a callback function when the port is successfully created , we call this function and console log in the terminal 
-//     console.log(`Nodejs server started on port ${port}`); // `` use kre to show port 
-// });
+});
 
-//http://localhost:8081
-
-//npm is node package manager
-//nodemon will automatically restart the server when you make any changes to the file and save it
-
-//in package json , dev is when we are still developing it but start is for deploying cuz others wont be making changes on it
-
-http
-    .createServer((req, res) => {
-        const { method, url } = req;
-
-        if (url === "/todos") {
-            if (method === "GET") {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.write(toDoList.toString());
-            } else if (method === "POST") { //post request me sb json format me jata h data
-                let body = "";
-                req.on('error', (err) => {
-                    console.error(err);
-                }).on('data', (chunk) => {
-                    body += chunk; //chunk is a variable representing the chunks that the body is composed of 
-                }).on('end', () => {
-                    body = JSON.parse(body);
-                    console.log("data: ", body);
-                });
-            }
-            else {
-                res.writeHead(404); //else an error
-            }
-        }
-        else {
-            res.writeHead(404);
-        }
-        res.end();
-    })
-    .listen(port, () => {
-        console.log(`Nodejs server started on port ${port}`);
+//now the post request 
+app.post("/todos", (req, res) => {
+    //isme wo chunk wala part nhi likhna pdta , that is done automatically by express , on its own app.use(express()) , wali line se, usse hi sb json me convert ho rha
+    let newToDoItem = req.body.item; //jo bhi naya item dalna h hume 
+    toDoList.push(newToDoItem);
+    res.status(201).send({
+        message: "Task added successfully", //qki ye ek object h isliye ye easily json me convert ho jata h
     });
+});
 
-//get means getting data from server, post means sending data to server., delete, patch means updation , put means overwriting , these are all http methods 
+app.delete("/todos", (req, res) => {
+    //callback
+    const itemToDelete = req.body.item; //item to be deleted utha lia body se 
+    toDoList.find((element, index) => { //when we use , find , we loop over it , and that particular index is found automatically and stored in the index variable 
+        if (element === itemToDelete) {
+            toDoList.splice(index, 1);
+        }
+    });
+    res.status(202).send({
+        message: `Deleted item - ${req.body.item}`,
+    });
+});
+
+//if there is some other method request, besides get post and delete in the todos route , then it will show this one for all of them 
+//invalid requests like, put, patch etc
+app.all("/todos", (req, res) => {
+    res.status(501).send();
+});
+
+app.all('*', (req, res) => { //* means all other routes except the ones that we have made, 
+    res.status(404).send();
+})
+
+//for other routes, inside the todos route, we can do 
+// app.get("/todos/create",)  //etc, but it is not logical because baki sare routes ke liye upr hi likh diya humne , isliye inko upr likho * aur all wali lines se
+
+app.listen(port, () => {
+    //callback
+    console.log(`Nodejs server started on port ${port}`);
+});
